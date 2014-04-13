@@ -1,0 +1,118 @@
+begin
+create index on :`Taxon`(`name`);
+create (_1:`Taxon`:`Strain` {`id`:511145, `name`:"Escherichia coli str. K-12 substr. MG1655"})
+create (_2:`Taxon` {`id`:83333, `name`:"Escherichia coli K-12"})
+create (_3:`Taxon`:`Species` {`id`:562, `name`:"Escherichia coli", `rank`:"species"})
+create (_4:`Taxon`:`Genus` {`id`:561, `name`:"Escherichia", `rank`:"genus"})
+create (_5:`Taxon` {`id`:543, `name`:"Enterobacteriaceae", `rank`:"family"})
+create (_6:`Taxon` {`id`:91347, `name`:"Enterobacteriales", `rank`:"order"})
+create (_7:`Taxon` {`id`:1236, `name`:"Gammaproteobacteria", `rank`:"class"})
+create (_8:`Taxon` {`id`:1224, `name`:"Proteobacteria", `rank`:"phylum"})
+create (_9:`Taxon` {`id`:2, `name`:"Bacteria", `rank`:"superkingdom"})
+create (_10:`Taxon` {`id`:131567, `name`:"cellular organisms", `rank`:"root"})
+create (_11:`Genome` {`geom`:"circular", `id`:"NC_000913.2", `length`:4639675, `name`:"Escherichia coli str. K-12 substr. MG1655, complete genome", `timestmp`:"22-JUL-2013"})
+create (_12:`TUnit` {`name`:"rrsC-gltU-rrlC-rrfC"})
+create (_13:`TUnit` {`name`:"rrsB-gltT-rrlB-rrfB"})
+create (_14:`Operon` {`name`:"rrsC-gltU-rrlC-rrfC"})
+create (_15:`Operon` {`name`:"rrsB-gltT-rrlB-rrfB"})
+create (_16:`Promoter`:`Feature` {`name`:"rrsCp2"})
+create (_17:`Promoter`:`Feature` {`name`:"rrsCp1"})
+create (_18:`Promoter`:`Feature` {`name`:"rrsBp2"})
+create (_19:`Promoter`:`Feature` {`name`:"rrsBp1"})
+create (_20:`Feature`:`Gene` {`blattner`:"b3756", `name`:"rrsC"})
+create (_21:`Feature`:`Gene` {`blattner`:"b3758", `name`:"rrlC"})
+create (_22:`Feature`:`Gene` {`blattner`:"b3759", `name`:"rrfC"})
+create (_23:`Feature`:`Gene` {`blattner`:"b3757", `name`:"gltU"})
+create (_24:`Feature`:`Gene` {`blattner`:"b3968", `name`:"rrsB"})
+create (_25:`Feature`:`Gene` {`blattner`:"b3970", `name`:"rrlB"})
+create (_26:`Feature`:`Gene` {`blattner`:"b3971", `name`:"rrfB"})
+create (_27:`Feature`:`Gene` {`blattner`:"b3969", `name`:"gltT"})
+create (_28:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:4164371, `id`:"ECK120012500", `pos`:-26, `seq`:"tttcctcttgTCAGGCCGGAATAACtccctataat", `start`:4164357, `strand`:"forward"})
+create (_29:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:4164347, `id`:"ECK120012498", `pos`:-50, `seq`:"gcgcggtcagAAAATTATTTTAAATttcctcttgt", `start`:4164333, `strand`:"forward"})
+create (_30:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:4164314, `id`:"ECK120011296", `pos`:-83, `seq`:"actggcagttTTAGGCTGATTTGGTtgaatgttgc", `start`:4164300, `strand`:"forward"})
+create (_31:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:4164326, `id`:"ECK120011288", `pos`:-71, `seq`:"aggctgatttGGTTGAATGTTGCGCggtcagaaaa", `start`:4164312, `strand`:"forward"})
+create (_32:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:4164295, `id`:"ECK120011290", `pos`:-102, `seq`:"gcttcgaaacGCTCGAAAAACTGGCagttttaggc", `start`:4164281, `strand`:"forward"})
+create (_33:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:4164254, `id`:"ECK120011292", `pos`:-143, `seq`:"gccaggagctGAACAATTATTGCCCgttttacagc", `start`:4164240, `strand`:"forward"})
+create (_34:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:3939476, `id`:"ECK120011690", `pos`:-70, `seq`:"ggggcttttgCTGAAAAAATGCGCGgtcagaaaat", `start`:3939462, `strand`:"forward"})
+create (_35:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:3939445, `id`:"ECK120011692", `pos`:-101, `seq`:"cggcaaattgCTTGTTTTATGGCACattaacgggg", `start`:3939431, `strand`:"forward"})
+create (_36:`Feature`:`TFBS` {`db`:"RegulonDB", `end`:3939425, `id`:"ECK120011694", `pos`:-121, `seq`:"tgtgattacgGTTGCAAAAACGGCAaattgcttgt", `start`:3939411, `strand`:"forward"})
+create (_37:`TransFactor`:`Protein` {`name`:"H-NS"})
+create (_38:`TransFactor`:`Protein` {`name`:"Fis"})
+create (_39:`Feature`:`Gene` {`blattner`:"b1237", `end`:1292145, `name`:"hns", `start`:1291732, `strand`:"reverse"})
+create (_40:`Feature`:`Gene` {`blattner`:"b3261", `end`:3409589, `name`:"fis", `start`:3409293, `strand`:"forward"})
+create _1-[:`IS_A`]->_2
+create _1-[:`ORGANISM`]->_11
+create _2-[:`IS_A`]->_3
+create _3-[:`IS_A`]->_4
+create _4-[:`IS_A`]->_5
+create _5-[:`IS_A`]->_6
+create _6-[:`IS_A`]->_7
+create _7-[:`IS_A`]->_8
+create _8-[:`IS_A`]->_9
+create _9-[:`IS_A`]->_10
+create _11-[:`CONTAINS`]->_27
+create _11-[:`CONTAINS`]->_26
+create _11-[:`CONTAINS`]->_25
+create _11-[:`CONTAINS`]->_24
+create _11-[:`CONTAINS`]->_23
+create _11-[:`CONTAINS`]->_22
+create _11-[:`CONTAINS`]->_21
+create _11-[:`CONTAINS`]->_20
+create _11-[:`CONTAINS`]->_19
+create _11-[:`CONTAINS`]->_18
+create _11-[:`CONTAINS`]->_17
+create _11-[:`CONTAINS`]->_16
+create _11-[:`CONTAINS`]->_28
+create _11-[:`CONTAINS`]->_29
+create _11-[:`CONTAINS`]->_30
+create _11-[:`CONTAINS`]->_31
+create _11-[:`CONTAINS`]->_32
+create _11-[:`CONTAINS`]->_33
+create _11-[:`CONTAINS`]->_34
+create _11-[:`CONTAINS`]->_35
+create _11-[:`CONTAINS`]->_36
+create _12-[:`PART_OF`]->_14
+create _13-[:`PART_OF`]->_15
+create _16-[:`CONTROL`]->_12
+create _17-[:`CONTROL` {`db`:"RegulonDB", `evType`:"weak", `evidence`:"Boundaries of transcription experimentally identified"}]->_12
+create _18-[:`CONTROL`]->_13
+create _19-[:`CONTROL` {`db`:"RegulonDB", `evType`:"weak", `evidence`:"Boundaries of transcription experimentally identified"}]->_13
+create _20-[:`PART_OF`]->_12
+create _21-[:`PART_OF`]->_12
+create _22-[:`PART_OF`]->_12
+create _23-[:`PART_OF`]->_12
+create _24-[:`PART_OF`]->_13
+create _25-[:`PART_OF`]->_13
+create _26-[:`PART_OF`]->_13
+create _27-[:`PART_OF`]->_13
+create _28-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"repressor"}]->_19
+create _28-[:`OVERLAP`]->_19
+create _29-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"repressor"}]->_19
+create _29-[:`OVERLAP`]->_19
+create _30-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"repressor"}]->_19
+create _30-[:`NEXT`]->_19
+create _31-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"activator"}]->_19
+create _31-[:`OVERLAP`]->_19
+create _32-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"activator"}]->_19
+create _32-[:`NEXT`]->_19
+create _33-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"activator"}]->_19
+create _33-[:`NEXT`]->_19
+create _34-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"activator"}]->_17
+create _34-[:`OVERLAP`]->_17
+create _35-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"activator"}]->_17
+create _35-[:`NEXT`]->_17
+create _36-[:`REGULATE` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins", `function`:"activator"}]->_17
+create _36-[:`NEXT`]->_17
+create _37-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_30
+create _37-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_29
+create _37-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_28
+create _38-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_36
+create _38-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_35
+create _38-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_34
+create _38-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_33
+create _38-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_32
+create _38-[:`BINDS` {`db`:"RegulonDB", `evType`:"strong", `evidence`:"Binding of purified proteins"}]->_31
+create _39-[:`ENCODE`]->_37
+create _40-[:`ENCODE`]->_38
+;
+commit

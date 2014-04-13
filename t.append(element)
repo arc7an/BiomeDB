@@ -1,0 +1,5 @@
+Help on method find in module py2neo.neo4j:
+
+ffiinndd(self, label, property_key=None, property_value=None) method of py2neo.neo4j.GraphDatabaseService instance
+    Iterate through a set of labelled nodes, optionally filtering
+    by property key and value

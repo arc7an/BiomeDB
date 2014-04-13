@@ -1,0 +1,169 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+/* line 6, ../scss/reset.scss */
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+/* line 16, ../scss/reset.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+/* line 19, ../scss/reset.scss */
+body {
+  line-height: 1;
+}
+
+/* line 22, ../scss/reset.scss */
+ol, ul {
+  list-style: none;
+}
+
+/* line 25, ../scss/reset.scss */
+blockquote, q {
+  quotes: none;
+}
+
+/* line 29, ../scss/reset.scss */
+blockquote:before, blockquote:after {
+  content: '';
+  content: none;
+}
+
+/* line 34, ../scss/reset.scss */
+q:before, q:after {
+  content: '';
+  content: none;
+}
+
+/* line 38, ../scss/reset.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* line 18, ../scss/main.scss */
+body {
+  font-size: 10pt;
+  font-family: Arial;
+  line-height: 1em;
+}
+
+/* line 24, ../scss/main.scss */
+header {
+  text-align: center;
+}
+
+/* line 28, ../scss/main.scss */
+h1 {
+  font-size: 200%;
+  font-weight: bold;
+  margin: 1em 0;
+}
+
+/* line 34, ../scss/main.scss */
+#page {
+  *zoom: 1;
+  margin: auto;
+  width: 61em;
+  max-width: 100%;
+  width: 1000px;
+}
+/* line 38, ../../../../Ruby193/lib/ruby/gems/1.9.1/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/utilities/general/_clearfix.scss */
+#page:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* line 39, ../scss/main.scss */
+#top {
+  display: inline;
+  float: left;
+  width: 100%;
+  margin-right: 2.04082%;
+  background: #99ee99;
+  margin-bottom: 1em;
+  text-align: center;
+}
+
+/* line 40, ../scss/main.scss */
+#left_column {
+  display: inline;
+  float: left;
+  width: 48.97959%;
+  margin-right: 2.04082%;
+}
+
+/* line 41, ../scss/main.scss */
+#right_column {
+  display: inline;
+  float: left;
+  width: 38.77551%;
+  margin-right: 2.04082%;
+  display: inline;
+  float: right;
+  margin-right: 0;
+  #margin-left: -1em;
+}
+
+/* line 42, ../scss/main.scss */
+.clear {
+  clear: both;
+}
+
+/* line 44, ../scss/main.scss */
+.result {
+  width: 100%;
+  text-align: left;
+}
+
+/* line 52, ../scss/main.scss */
+table th {
+  font-weight: bold;
+  background-color: #f0f0f0;
+}
+/* line 56, ../scss/main.scss */
+table td, table th {
+  border: 1px solid #cccccc;
+  padding: 3px;
+}
+
+/* line 63, ../scss/main.scss */
+.nodes_list li {
+  margin: 0.5em 0;
+  line-height: 1em;
+}
+
+/* line 69, ../scss/main.scss */
+.springs {
+  margin-left: 50px;
+}
+/* line 71, ../scss/main.scss */
+.springs ul li:nth-child(1) {
+  margin-top: 1em;
+}
+
+/* line 76, ../scss/main.scss */
+.shifted_list {
+  margin-left: 3em;
+}
+
+/* line 80, ../scss/main.scss */
+#query_label {
+  margin-right: 1em;
+  font-weight: bold;
+}
