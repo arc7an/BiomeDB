@@ -12,7 +12,7 @@ def create_nodes(seq_name, data_base):
     aminoacid sequence and label with organism name.
     For each 'polypeptide'-node 'XRef'-node is created. 'XRef'-nodes
     have properties 'uniprot', which contains the uniprot-link and 'qualifier' with value 'is_a'.
-    'polypeptide' and 'XRef' are connected with relationship with label 'REF'
+    'polypeptide' and 'XRef' are connected with relationship with label 'REF'.
     """
     rec = SeqIO.read(seq_name, 'genbank')
     organism = rec.features[0].qualifiers['organism'][0]
@@ -30,6 +30,7 @@ def create_nodes(seq_name, data_base):
             xref.add_labels('XRef')
             data_base.create(rel(xref, 'REF', polypeptide))
             data_base.create(rel(polypeptide, 'ENCODED', element))
+
 
 def relation_next(data_base, label):
     """
@@ -76,6 +77,7 @@ def add_label_to_nodes(data_base, label, label_to_add):
     elements = data_base.find(label)
     for element in elements:
         element.add_labels(label_to_add)
+
 
 def relation_similar(data_base, organism, similar_quantity = 3):
     """
