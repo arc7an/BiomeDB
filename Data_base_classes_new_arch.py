@@ -80,17 +80,29 @@ class Biome_db():
             if feature.type == 'CDS':
                 self._cds2poly(feature, element, source)
 
-
     def relation_next(self, organism):
         """
         The function creates relationships 'NEXT' in the 'data_base' between nodes with label 'label'.
         The nodes must have property 'start' as the function compare 2 'start' values
         to make the relationship.
         """
-        ordered = self._feature_start_ordering(organism)
-        for i in xrange(2, len(ordered)):
-            self.data_base.create(rel(ordered[i][0], 'NEXT', ordered[i-1][0]))
+        check_list = self._relation_checker('feature', organism, 'NEXT')
+        if len(check_list) == 0:
+            ordered = self._feature_start_ordering(organism)
+            for i in xrange(2, len(ordered)):
+                self.data_base.create(rel(ordered[i][0], 'NEXT', ordered[i-1][0]))
+        else:
+            print 'NEXT relationships is already exist for ' + organism
         #checking for already NEXT
+
+    def _relation_checker(self, search_label, organism, relation):
+        session = cypher.Session()
+        transaction = session.create_transaction()
+        query = 'MATCH (f1:`' + search_label + '`)-[:`' + relation + '`]->(f2:`'\
+                  + search_label + '`)-[:`PART_OF`]->(org:`' + organism + '`) RETURN f2'
+        transaction.append(query)
+        transaction_out = transaction.execute()
+        return transaction_out[0]
 
     def _feature_start_ordering(self, organism):
         #session = cypher.Session()
@@ -114,7 +126,6 @@ class Biome_db():
         transaction = session.create_transaction()
         query = 'MATCH (a:' + organism + ')-[r:PART_OF]-(b:' + label + ') RETURN b'
         transaction.append(query)
-        #print query
         transaction_out = transaction.execute()
         nodes = []
         for node in transaction_out[0]:
@@ -136,9 +147,6 @@ class Biome_db():
     #        ordering[feature] = feature.get_properties()['start']
     #    return sorted(ordering.iteritems(), key=operator.itemgetter(1))
 
-
-
-
     def relation_overlap(self, organism):
         """
         Function creates relationships 'OVERLAP' between features of organism with name 'organism_label'.
@@ -146,12 +154,16 @@ class Biome_db():
         the relationship is created.
         There is a check for property 'start'.
         """
-        ordered = self._feature_start_ordering(organism)
-        for i in xrange(2, len(ordered)):
-            for j in xrange(i-1, -1, -1):
-                #<= or <?
-                if ordered[j][0]['end'] <= ordered[i][0]['end'] and ordered[j][0]['end'] >= ordered[i][0]['start']:
-                    self.data_base.create(rel(ordered[i][0], 'OVERLAP', ordered[j][0]))
+        check_list = self._relation_checker('feature', organism, 'OVERLAP')
+        if len(check_list) == 0:
+            ordered = self._feature_start_ordering(organism)
+            for i in xrange(2, len(ordered)):
+                for j in xrange(i-1, -1, -1):
+                    #<= or <?
+                    if ordered[j][0]['end'] <= ordered[i][0]['end'] and ordered[j][0]['end'] >= ordered[i][0]['start']:
+                        self.data_base.create(rel(ordered[i][0], 'OVERLAP', ordered[j][0]))
+        else:
+            print 'OVERLAP relationships is already exist for ' + organism
 
 
     def add_label_to_nodes(self, label, label_to_add):
