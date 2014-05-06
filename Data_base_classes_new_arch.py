@@ -11,9 +11,9 @@ class Biome_db():
 
     def __init__(self, link):
         self.data_base = neo4j.GraphDatabaseService(link)
-        self.sp = list(self.data_base.find('sp'))
-        self.gb = list(self.data_base.find('gb'))
-        self.pdb = list(self.data_base.find('pdb'))
+        self.sp = list(self.data_base.find('sp'))[0]
+        self.gb = list(self.data_base.find('gb'))[0]
+        self.pdb = list(self.data_base.find('pdb'))[0]
         if len(self.sp) == 0:
             self.sp, = self.data_base.create(node())
             self.sp.add_labels('sp')
@@ -44,7 +44,7 @@ class Biome_db():
         if len(organism_nodes) == 0:
             self._create_features(rec, organism)
         else:
-            print 'Organism is already in base.'
+            print 'Organism is already in base'
         return organism
 
     def _cds2poly(self, feature, element, source):
@@ -238,7 +238,7 @@ class Biome_db():
                     self._blaster('current_protein.txt', offline=True, similar_quantity=similar_quantity, e_value=e_value)
                 #blast_write = NCBIWWW.qblast('blastp', 'nr', str(polypeptide.get_properties()['seq']))
                 #blast_read = NCBIXML.read(blast_write)
-                print 'Blasted ' + str(polypeptide_counter)
+                print 'Blasted:' + str(polypeptide_counter)
                 polypeptide_counter += 1
                 for i in xrange(similar_quantity):
                     sim_polypeptide, = self.data_base.create(node({'seq': protein_sequence}))
