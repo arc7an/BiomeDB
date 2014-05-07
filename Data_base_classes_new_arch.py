@@ -11,16 +11,19 @@ class Biome_db():
 
     def __init__(self, link):
         self.data_base = neo4j.GraphDatabaseService(link)
-        self.sp = list(self.data_base.find('sp'))[0]
-        self.gb = list(self.data_base.find('gb'))[0]
-        self.pdb = list(self.data_base.find('pdb'))[0]
-        if len(self.sp) == 0:
+        try:
+            self.sp = list(self.data_base.find('sp'))[0]
+        except:
             self.sp, = self.data_base.create(node())
             self.sp.add_labels('sp')
-        if len(self.gb) == 0:
+        try:
+            self.gb = list(self.data_base.find('gb'))[0]
+        except:
             self.gb, = self.data_base.create(node())
             self.gb.add_labels('gb')
-        if len(self.pdb) == 0:
+        try:
+            self.pdb = list(self.data_base.find('pdb'))[0]
+        except:
             self.pdb, = self.data_base.create(node())
             self.pdb.add_labels('pdb')
 
@@ -93,7 +96,6 @@ class Biome_db():
                 self.data_base.create(rel(ordered[i][0], 'NEXT', ordered[i-1][0]))
         else:
             print 'NEXT relationships is already exist for ' + organism
-        #checking for already NEXT
 
     def _relation_checker(self, search_label, organism, relation):
         session = cypher.Session()
@@ -105,16 +107,6 @@ class Biome_db():
         return transaction_out[0]
 
     def _feature_start_ordering(self, organism):
-        #session = cypher.Session()
-        #transaction = session.create_transaction()
-        #query = 'MATCH (a:' + organism + ')-[r:PART_OF]-(b:feature) RETURN b'
-        #transaction.append(query)
-        #transaction_out = transaction.execute()
-        #features = []
-        #for element in transaction_out[0]:
-        #    features.append(element[0])
-        ##giva a to _feature_start_ordering
-        #del transaction_out
         features = self._search_parts_of_organism(organism, 'feature')
         ordering = {}
         for feature in features:
@@ -133,19 +125,6 @@ class Biome_db():
             nodes.append(node[0])
         del transaction_out
         return nodes
-
-    #def _feature_start_ordering(self, organism):
-    #    elements = list(self.data_base.find(organism))
-    #    features = []
-    #    for i in elements:
-    #        if 'feature' in i.get_labels():
-    #            features.append(i)
-    #    del elements
-    #    #
-    #    ordering = {}
-    #    for feature in features:
-    #        ordering[feature] = feature.get_properties()['start']
-    #    return sorted(ordering.iteritems(), key=operator.itemgetter(1))
 
     def relation_overlap(self, organism):
         """
@@ -187,23 +166,18 @@ class Biome_db():
         cdss = list(self.data_base.find('CDS'))
         mrnas = list(self.data_base.find('mRNA'))
         for gene in genes:
-            #print gene
             start = gene.get_properties()['start']
             end = gene.get_properties()['end']
-            #print start, end
             for cds in cdss:
                 cds_start = cds.get_properties()['start']
                 cds_end = cds.get_properties()['end']
-                #print cds_start, cds_end
                 if start <= cds_start <= end and start <= cds_end <= end:
                     self.data_base.create(rel(cds, 'VERSION_OF', gene))
-                    #print 'VERSION_OF'
             for mrna in mrnas:
                 mrna_start = mrna.get_properties()['start']
                 mrna_end = mrna.get_properties()['end']
                 if start <= mrna_start <= end and start <= mrna_end <= end:
                     self.data_base.create(rel(gene, 'ENCODE', mrna))
-                    #print 'ENCODE'
 
     def relation_similar(self, organism, offline = True, similar_quantity = 3, e_value = 0.01):
         """
@@ -217,13 +191,6 @@ class Biome_db():
         polypeptides_all = self.data_base.find('polypeptide')
         polypeptides_analyzed = list(self._search_similar_polypeptides(organism))
         polypeptide_counter = 1
-        #for polypeptide in polypeptides_all:
-        #    incoming_rels = polypeptide.match_incoming()
-        #    already_exists = False
-        #    for incoming in incoming_rels:
-        #        #cypher query match (c:polypeptide)-[:`SIMILAR`]->(a:polypeptide)-[:`PART_OF`]->(b:Enterobacteria_phage_T7) return a
-        #        if (incoming.type == 'SIMILAR') and (organism in polypeptide.get_labels()):
-        #            already_exists = True
         for polypeptide in polypeptides_all:
             already_exists = False
             if polypeptide in polypeptides_analyzed:
@@ -236,8 +203,6 @@ class Biome_db():
                 print str(polypeptide.get_properties()['seq'])
                 protein_sequence, gb, pdb, sp = \
                     self._blaster('current_protein.txt', offline=True, similar_quantity=similar_quantity, e_value=e_value)
-                #blast_write = NCBIWWW.qblast('blastp', 'nr', str(polypeptide.get_properties()['seq']))
-                #blast_read = NCBIXML.read(blast_write)
                 print 'Blasted:' + str(polypeptide_counter)
                 polypeptide_counter += 1
                 for i in xrange(similar_quantity):
@@ -245,18 +210,11 @@ class Biome_db():
                     sim_polypeptide.add_labels('polypeptide')
                     self.data_base.create(rel(sim_polypeptide, 'SIMILAR', polypeptide))
                     if len(gb[i]) > 0:
-                        gb_node, = self.data_base.create(node({'name': gb[i]}))
-                        gb_node.add_labels('gb')
-                        self.data_base.create(rel(gb_node, ('LINK', {'qualifier':'is_a'}), sim_polypeptide))
+                        self.data_base.create(rel(self.gb, ('XREF', {'id': gb[i]}), sim_polypeptide))
                     if len(pdb[i]) > 0:
-                        pdb_node, = self.data_base.create(node({'name': pdb[i]}))
-                        pdb_node.add_labels('pdb')
-                        self.data_base.create(rel(pdb_node, ('LINK', {'qualifier':'is_a'}), sim_polypeptide))
+                        self.data_base.create(rel(self.pdb, ('XREF', {'id': pdb[i]}), sim_polypeptide))
                     if len(sp[i]) > 0:
-                        sp_node, = self.data_base.create(node({'name': sp[i]}))
-                        sp_node.add_labels('sp')
-                        self.data_base.create(rel(sp_node, ('LINK', {'qualifier':'is_a'}), sim_polypeptide))
-                    #print blast_read.alignments[i].title[:3] + blast_read.alignments[i].title[3:].split('|')[0] + '\n'
+                        self.data_base.create(rel(self.sp, ('XREF', {'id': sp[i]}), sim_polypeptide))
             else:
                 print 'Found! ' + str(polypeptide_counter)
                 polypeptide_counter += 1
@@ -295,41 +253,14 @@ class Biome_db():
             sp.append(str(blast_read.alignments[i].title.partition('sp|')[-1].partition('|')[0]))
         return blast_read.alignments[i].hsps[0].match, gb, pdb, sp
 
-    #def _blast_ncbi(self, protein_sequence, similar_quantity):
-    #    blast_write = NCBIWWW.qblast('blastp', 'nr', protein_sequence)
-    #    blast_read = NCBIXML.read(blast_write)
-    #    gb, pdb, sp = [], [], []
-    #    for i in xrange(similar_quantity):
-    #        gb.append(str(blast_read.alignments[i].title.partition('gb|')[-1].partition('|')[0]))
-    #        pdb.append(str(blast_read.alignments[i].title.partition('pdb|')[-1].partition('|')[0]))
-    #        sp.append(str(blast_read.alignments[i].title.partition('sp|')[-1].partition('|')[0]))
-    #    return blast_read.alignments[i].hsps[0].match, gb, pdb, sp
-    #
-    #def _blast(self, protein_sequence, offline = True, similar_quantity = 3, e_value = 0.01):
-    #    if offline:
-    #        cline=NcbiblastpCommandline(query=protein_sequence,
-    #                            db='/home/artem/BLAST_DB/nr', evalue=e_value,
-    #                            outfmt=5, out='prot_out.xml')
-    #        blast_write = open('prot_out.xml')
-    #        blast_read = NCBIXML.read(blast_write)
-    #    else:
-    #        #add e_value for online
-    #        blast_write = NCBIWWW.qblast('blastp', 'nr', protein_sequence)
-    #        blast_read = NCBIXML.read(blast_write)
-    #    gb, pdb, sp = [], [], []
-    #    for i in xrange(similar_quantity):
-    #        gb.append(str(blast_read.alignments[i].title.partition('gb|')[-1].partition('|')[0]))
-    #        pdb.append(str(blast_read.alignments[i].title.partition('pdb|')[-1].partition('|')[0]))
-    #        sp.append(str(blast_read.alignments[i].title.partition('sp|')[-1].partition('|')[0]))
-    #    return blast_read.alignments[i].hsps[0].match, gb, pdb, sp
-
-def blast_standalone(protein_sequence = '/home/artem/work/reps/neo4j/prot.txt', e_value = 0.01, similar_quantity = 3):
-    cline=NcbiblastpCommandline(query=protein_sequence,
-                                db='/home/artem/BLAST_DB/nr', evalue=e_value,
-                                outfmt=5, out='prot_out.xml')
-    cline()
-    res = open('prot_out.xml')
-    rec = NCBIXML.read(res)
+#Testing function
+#def blast_standalone(protein_sequence = '/home/artem/work/reps/neo4j/prot.txt', e_value = 0.01, similar_quantity = 3):
+#    cline=NcbiblastpCommandline(query=protein_sequence,
+#                                db='/home/artem/BLAST_DB/nr', evalue=e_value,
+#                                outfmt=5, out='prot_out.xml')
+#    cline()
+#    res = open('prot_out.xml')
+#    rec = NCBIXML.read(res)
     #for record in rec.alignments[:similar_quantity]:
 #seems to work. Check on more protein examples and make as class
 
