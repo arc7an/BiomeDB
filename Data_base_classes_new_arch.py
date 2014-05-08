@@ -57,10 +57,13 @@ class Biome_db():
         """
         polypeptide, = self.data_base.create(node({'seq': feature.qualifiers['translation'][0]}))
         polypeptide.add_labels('polypeptide')
-        xref, = self.data_base.create(node({'uniprot': feature.qualifiers['db_xref'][1].split(':')[1],
-                                       'qualifier': 'is_a'}))
-        xref.add_labels('XRef')
-        self.data_base.create(rel(xref, 'REF', polypeptide))
+        #xref, = self.data_base.create(node({'uniprot': feature.qualifiers['db_xref'][1].split(':')[1],
+        #                               'qualifier': 'is_a'}))
+        #
+        #xref.add_labels('XRef')
+        #self.data_base.create(rel(xref, 'REF', polypeptide))
+        self.data_base.create(rel(polypeptide,
+                              ('XREF', {'id': feature.qualifiers['db_xref'][1].split(':')[1]}), self.sp))
         self.data_base.create(rel(element, 'ENCODE', polypeptide))
         self.data_base.create(rel(polypeptide, 'PART_OF', source))
 
@@ -73,7 +76,7 @@ class Biome_db():
                                               'end': int(gb_record.features[0].location.end),
                                               'strand': gb_record.features[0].location.strand})))
         source.add_labels('source', organism)
-        gb_record.features[0]
+        #gb_record.features[0]
         for feature in gb_record.features[1:]:
             element, = self.data_base.create(node({'start': int(feature.location.start),
                                               'end': int(feature.location.end),
@@ -89,7 +92,8 @@ class Biome_db():
         The nodes must have property 'start' as the function compare 2 'start' values
         to make the relationship.
         """
-        check_list = self._relation_checker('feature', organism, 'NEXT')
+        #check_list = self._relation_checker('feature', organism, 'NEXT')
+        check_list = self.search_two_rels('feature', 'feature', organism, 'NEXT', 'PART_OF')
         if len(check_list) == 0:
             ordered = self._feature_start_ordering(organism)
             for i in xrange(2, len(ordered)):
@@ -97,34 +101,13 @@ class Biome_db():
         else:
             print 'NEXT relationships is already exist for ' + organism
 
-    def _relation_checker(self, search_label, organism, relation):
-        session = cypher.Session()
-        transaction = session.create_transaction()
-        query = 'MATCH (f1:`' + search_label + '`)-[:`' + relation + '`]->(f2:`'\
-                  + search_label + '`)-[:`PART_OF`]->(org:`' + organism + '`) RETURN f2'
-        transaction.append(query)
-        transaction_out = transaction.execute()
-        return transaction_out[0]
-
     def _feature_start_ordering(self, organism):
-        features = self._search_parts_of_organism(organism, 'feature')
+        query_out = self.search_one_rel('feature', organism, 'PART_OF')
         ordering = {}
-        for feature in features:
+        for out in query_out:
+            feature = out[0]
             ordering[feature] = feature.get_properties()['start']
         return sorted(ordering.iteritems(), key=operator.itemgetter(1))
-
-    def _search_parts_of_organism(self, organism, label):
-        session = cypher.Session()
-        transaction = session.create_transaction()
-        query = 'MATCH (a:' + organism + ')-[r:PART_OF]-(b:' + label + ') RETURN b'
-        transaction.append(query)
-        transaction_out = transaction.execute()
-        nodes = []
-        for node in transaction_out[0]:
-            #print node
-            nodes.append(node[0])
-        del transaction_out
-        return nodes
 
     def relation_overlap(self, organism):
         """
@@ -133,7 +116,7 @@ class Biome_db():
         the relationship is created.
         There is a check for property 'start'.
         """
-        check_list = self._relation_checker('feature', organism, 'OVERLAP')
+        check_list = self.search_two_rels('feature', 'feature', organism, 'OVERLAP', 'PART_OF')
         if len(check_list) == 0:
             ordered = self._feature_start_ordering(organism)
             for i in xrange(2, len(ordered)):
@@ -147,13 +130,16 @@ class Biome_db():
 
     def add_label_to_nodes(self, label, label_to_add):
         """
-        The function adds new 'label_to_add' to the element with known label 'label'.
+        The function adds new 'label_to_add' to the element with label 'label'.
         """
         elements = self.data_base.find(label)
         for element in elements:
             element.add_labels(label_to_add)
 
     def add_property_to_nodes(self, label, property_to_add, value_to_add):
+        """
+        Function adds new property 'property_to_add' with value 'value_to_add' to the element with label 'label'.
+        """
         elements = self.data_base.find(label)
         for element in elements:
             properties = element.get_properties()
@@ -189,32 +175,36 @@ class Biome_db():
         'qualifier' and value 'is_a'. Links labels are 'pdb', 'gb', and/or 'sp'.
         """
         polypeptides_all = self.data_base.find('polypeptide')
-        polypeptides_analyzed = list(self._search_similar_polypeptides(organism))
+        #polypeptides_analyzed = list(self._search_similar_polypeptides(organism))
+        polypeptides_analyzed = []
+        blasted_searching = self.search_two_rels('polypeptide', 'polypeptide', organism, 'SIMILAR', 'PART_OF')
+        for out in blasted_searching:
+            polypeptides_analyzed.append(out[1])
         polypeptide_counter = 1
         for polypeptide in polypeptides_all:
             already_exists = False
             if polypeptide in polypeptides_analyzed:
-                already_exists =True
+                already_exists = True
             if already_exists == False:
                 protein_txt = open('current_protein.txt', 'w')
                 protein_txt.write(str(polypeptide.get_properties()['seq']))
                 print ctime()
                 protein_txt.close()
                 print str(polypeptide.get_properties()['seq'])
-                protein_sequence, gb, pdb, sp = \
+                homolog_sequence, gb, pdb, sp = \
                     self._blaster('current_protein.txt', offline=True, similar_quantity=similar_quantity, e_value=e_value)
                 print 'Blasted:' + str(polypeptide_counter)
                 polypeptide_counter += 1
                 for i in xrange(similar_quantity):
-                    sim_polypeptide, = self.data_base.create(node({'seq': protein_sequence}))
+                    sim_polypeptide, = self.data_base.create(node({'seq': homolog_sequence}))
                     sim_polypeptide.add_labels('polypeptide')
                     self.data_base.create(rel(sim_polypeptide, 'SIMILAR', polypeptide))
                     if len(gb[i]) > 0:
-                        self.data_base.create(rel(self.gb, ('XREF', {'id': gb[i]}), sim_polypeptide))
+                        self.data_base.create(rel(sim_polypeptide, ('XREF', {'id': gb[i]}), self.gb))
                     if len(pdb[i]) > 0:
-                        self.data_base.create(rel(self.pdb, ('XREF', {'id': pdb[i]}), sim_polypeptide))
+                        self.data_base.create(rel(sim_polypeptide, ('XREF', {'id': pdb[i]}), self.pdb))
                     if len(sp[i]) > 0:
-                        self.data_base.create(rel(self.sp, ('XREF', {'id': sp[i]}), sim_polypeptide))
+                        self.data_base.create(rel(sim_polypeptide, ('XREF', {'id': sp[i]}), self.sp))
             else:
                 print 'Found! ' + str(polypeptide_counter)
                 polypeptide_counter += 1
@@ -231,7 +221,6 @@ class Biome_db():
         for node in transaction_out[0]:
             #print node
             nodes.append(node[0])
-        del transaction_out
         return nodes
 
     def _blaster(self, protein_sequence, offline = True, similar_quantity = 3, e_value = 0.01):
@@ -246,12 +235,39 @@ class Biome_db():
             #add e_value for online
             blast_write = NCBIWWW.qblast('blastp', 'nr', protein_sequence)
             blast_read = NCBIXML.read(blast_write)
-        gb, pdb, sp = [], [], []
+        homolog_seq, gb, pdb, sp = [], [], [], []
+        #check alignments - they can be empty!
         for i in xrange(similar_quantity):
             gb.append(str(blast_read.alignments[i].title.partition('gb|')[-1].partition('|')[0]))
             pdb.append(str(blast_read.alignments[i].title.partition('pdb|')[-1].partition('|')[0]))
             sp.append(str(blast_read.alignments[i].title.partition('sp|')[-1].partition('|')[0]))
-        return blast_read.alignments[i].hsps[0].match, gb, pdb, sp
+            homolog_seq.append(blast_read.alignments[i].hsps[0].match)
+        #return blast_read.alignments[i].hsps[0].match, gb, pdb, sp
+        return homolog_seq, gb, pdb, sp
+
+    def search_one_rel(self, label_out, label_in, relation):
+        session = cypher.Session()
+        transaction = session.create_transaction()
+        query = 'MATCH (node_out:' + label_out + ')' \
+                '-[rel:`' + relation + '`]->' \
+                ' (node_in:' + label_in + ') RETURN node_out, node_in, rel'
+        transaction.append(query)
+        transaction_out = transaction.execute()
+        out = []
+        for result in transaction_out[0]:
+            out.append(result.values)
+        return out
+
+    def search_two_rels(self, label_left, label_middle, label_right, relation_lm, relation_mr):
+        session = cypher.Session()
+        transaction = session.create_transaction()
+        query = 'MATCH (label_left:' + label_left + ')-[relation_lm:`' + relation_lm + '`]->(label_middle:' + label_middle + ')-[relation_mr:`' + relation_mr + '`]->(label_right:' + label_right + ') RETURN label_left, label_middle, label_right, relation_lm, relation_mr'
+        transaction.append(query)
+        transaction_out = transaction.execute()
+        out = []
+        for result in transaction_out[0]:
+            out.append(result.values)
+        return out
 
 #Testing function
 #def blast_standalone(protein_sequence = '/home/artem/work/reps/neo4j/prot.txt', e_value = 0.01, similar_quantity = 3):
