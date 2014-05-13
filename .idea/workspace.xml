@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7d204a0a-2771-4cdc-88d5-5869a1a94de3" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/converter.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Data_base_classes_new_arch.py" afterPath="$PROJECT_DIR$/Data_base_classes_new_arch.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/current_protein.txt" afterPath="$PROJECT_DIR$/current_protein.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/prot_out.xml" afterPath="$PROJECT_DIR$/prot_out.xml" />
@@ -31,7 +32,7 @@
       <file leaf-file-name="Data_base_classes.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Data_base_classes.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="66" selection-start="1866" selection-end="1866" vertical-scroll-proportion="0.0" vertical-offset="1088" max-vertical-offset="1935">
+            <state line="31" column="66" selection-start="1866" selection-end="1866" vertical-scroll-proportion="0.0" vertical-offset="465" max-vertical-offset="1965">
               <folding />
             </state>
           </provider>
@@ -40,7 +41,7 @@
       <file leaf-file-name="Data_base_classes_dev.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Data_base_classes_dev.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="57" selection-start="1676" selection-end="1676" vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="2820">
+            <state line="34" column="57" selection-start="1676" selection-end="1676" vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="2865">
               <folding />
             </state>
           </provider>
@@ -49,10 +50,19 @@
       <file leaf-file-name="Data_base_classes_new_arch.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Data_base_classes_new_arch.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="143" column="32" selection-start="6771" selection-end="6771" vertical-scroll-proportion="0.61393154" vertical-offset="1625" max-vertical-offset="4320">
+            <state line="331" column="49" selection-start="16605" selection-end="16605" vertical-scroll-proportion="0.8363636" vertical-offset="4275" max-vertical-offset="5100">
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="converter.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/converter.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="22" column="0" selection-start="687" selection-end="687" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="420">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -77,13 +87,14 @@
       <list>
         <option value="$PROJECT_DIR$/Data_base_classes.py" />
         <option value="$PROJECT_DIR$/Data_base_classes_dev.py" />
+        <option value="$PROJECT_DIR$/converter.py" />
         <option value="$PROJECT_DIR$/Data_base_classes_new_arch.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="70" />
-    <option name="width" value="735" />
+    <option name="width" value="747" />
     <option name="height" value="1010" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -251,7 +262,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="70" width="735" height="1010" extended-state="4" />
+    <frame x="0" y="70" width="747" height="1010" extended-state="4" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -287,13 +298,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Data_base_classes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="66" selection-start="1866" selection-end="1866" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1965">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Data_base_classes_dev.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="34" column="57" selection-start="1676" selection-end="1676" vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="2865">
@@ -389,14 +393,21 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Data_base_classes_dev.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="57" selection-start="1676" selection-end="1676" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2865">
+        <state line="34" column="57" selection-start="1676" selection-end="1676" vertical-scroll-proportion="0.0" vertical-offset="90" max-vertical-offset="2820">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/converter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="0" selection-start="687" selection-end="687" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="420">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Data_base_classes_new_arch.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="143" column="32" selection-start="6771" selection-end="6771" vertical-scroll-proportion="0.61393154" vertical-offset="1625" max-vertical-offset="4320">
+        <state line="331" column="49" selection-start="16605" selection-end="16605" vertical-scroll-proportion="0.8363636" vertical-offset="4275" max-vertical-offset="5100">
           <folding>
             <element signature="e#0#21#0" expanded="true" />
           </folding>

@@ -1,8 +1,11 @@
 from Bio import SeqIO
 from Bio.Blast import NCBIWWW, NCBIXML
 from Bio.Blast.Applications import NcbiblastpCommandline
+from Bio.Alphabet import generic_dna
+from Bio.Seq import Seq
 from py2neo import neo4j, node, rel, cypher
 from time import ctime
+import datetime
 import operator
 
 #rm -rf /var/lib/neo4j/data/graph.db/* - purges DB
@@ -11,6 +14,7 @@ class Biome_db():
 
     def __init__(self, link):
         self.data_base = neo4j.GraphDatabaseService(link)
+        self.date = datetime.datetime.now().strftime('%d-%m-%y')
         try:
             self.sp = list(self.data_base.find('sp'))[0]
         except:
@@ -62,8 +66,12 @@ class Biome_db():
         #
         #xref.add_labels('XRef')
         #self.data_base.create(rel(xref, 'REF', polypeptide))
-        self.data_base.create(rel(polypeptide,
-                              ('XREF', {'id': feature.qualifiers['db_xref'][1].split(':')[1]}), self.sp))
+        xref, = self.data_base.create(node({'id': feature.qualifiers['db_xref'][1].split(':')[1]}))
+        xref.add_labels('XRef')
+        self.data_base.create(rel(polypeptide, 'REFERENCE_TO', xref))
+        self.data_base.create(rel(xref, 'LINK_TO', self.sp))
+        #self.data_base.create(rel(polypeptide,
+        #                      ('XREF', {'id': feature.qualifiers['db_xref'][1].split(':')[1]}), self.sp))
         self.data_base.create(rel(element, 'ENCODE', polypeptide))
         self.data_base.create(rel(polypeptide, 'PART_OF', source))
 
@@ -71,6 +79,7 @@ class Biome_db():
         """
         Additional function for create_nodes.
         Makes nodes from input sequence elements with labels and properties.
+        !! NO UPDATE.
         """
         source, = self.data_base.create(node(({'start': int(gb_record.features[0].location.start),
                                               'end': int(gb_record.features[0].location.end),
@@ -96,8 +105,17 @@ class Biome_db():
         check_list = self.search_two_rels('feature', 'feature', organism, 'NEXT', 'PART_OF')
         if len(check_list) == 0:
             ordered = self._feature_start_ordering(organism)
-            for i in xrange(2, len(ordered)):
-                self.data_base.create(rel(ordered[i][0], 'NEXT', ordered[i-1][0]))
+            strand1, strand2 = [], []
+            for feature in ordered:
+                if feature.get_properties()['strand'] == 1:
+                    strand1.append(feature)
+                else:
+                    strand2.append(feature)
+            del ordered
+            for i in xrange(2, len(strand1)):
+                self.data_base.create(rel(strand1[i], 'NEXT', strand1[i-1]))
+            for i in xrange(2, len(strand2)):
+                self.data_base.create(rel(strand1[i], 'NEXT', strand1[i-1]))
         else:
             print 'NEXT relationships is already exist for ' + organism
 
@@ -107,7 +125,8 @@ class Biome_db():
         for out in query_out:
             feature = out[0]
             ordering[feature] = feature.get_properties()['start']
-        return sorted(ordering.iteritems(), key=operator.itemgetter(1))
+        ordered = sorted(ordering.iteritems(), key=operator.itemgetter(1))
+        return [element[0] for element in ordered]
 
     def relation_overlap(self, organism):
         """
@@ -122,8 +141,8 @@ class Biome_db():
             for i in xrange(2, len(ordered)):
                 for j in xrange(i-1, -1, -1):
                     #<= or <?
-                    if ordered[j][0]['end'] <= ordered[i][0]['end'] and ordered[j][0]['end'] >= ordered[i][0]['start']:
-                        self.data_base.create(rel(ordered[i][0], 'OVERLAP', ordered[j][0]))
+                    if ordered[j]['end'] <= ordered[i]['end'] and ordered[j]['end'] >= ordered[i]['start']:
+                        self.data_base.create(rel(ordered[i], 'OVERLAP', ordered[j]))
         else:
             print 'OVERLAP relationships is already exist for ' + organism
 
@@ -148,9 +167,15 @@ class Biome_db():
 
     def gene_analyzer(self, organism):
         #make proper find nodes
-        genes = list(self.data_base.find('gene'))
-        cdss = list(self.data_base.find('CDS'))
-        mrnas = list(self.data_base.find('mRNA'))
+        #genes = list(self.data_base.find('gene'))
+        #cdss = list(self.data_base.find('CDS'))
+        #mrnas = list(self.data_base.find('mRNA'))
+        gene_query = self.search_one_rel('gene', organism, 'PART_OF')
+        cds_query = self.search_one_rel('CDS', organism, 'PART_OF')
+        mrna_query = self.search_one_rel('mRNA', organism, 'PART_OF')
+        genes = [g[0] for g in gene_query]
+        cdss = [c[0] for c in cds_query]
+        mrnas = [m[0] for m in mrna_query]
         for gene in genes:
             start = gene.get_properties()['start']
             end = gene.get_properties()['end']
@@ -191,37 +216,47 @@ class Biome_db():
                 print ctime()
                 protein_txt.close()
                 print str(polypeptide.get_properties()['seq'])
-                homolog_sequence, gb, pdb, sp = \
+                homolog_sequence, gb, pdb, sp, similar_quantity_new = \
                     self._blaster('current_protein.txt', offline=True, similar_quantity=similar_quantity, e_value=e_value)
                 print 'Blasted:' + str(polypeptide_counter)
                 polypeptide_counter += 1
-                for i in xrange(similar_quantity):
-                    sim_polypeptide, = self.data_base.create(node({'seq': homolog_sequence}))
+                for i in xrange(similar_quantity_new):
+                    #sim_polypeptide, = self.data_base.create(node({'seq': homolog_sequence}))
+                    sim_polypeptide, = self.data_base.create(node())
                     sim_polypeptide.add_labels('polypeptide')
-                    self.data_base.create(rel(sim_polypeptide, 'SIMILAR', polypeptide))
+                    self.data_base.create(rel(sim_polypeptide, ('SIMILAR', {'date': self.date}), polypeptide))
                     if len(gb[i]) > 0:
-                        self.data_base.create(rel(sim_polypeptide, ('XREF', {'id': gb[i]}), self.gb))
+                        xref_gb, = self.data_base.create(node({'id': gb[i]}))
+                        xref_gb.add_labels('XRef')
+                        self.data_base.create(rel(sim_polypeptide, 'REFERENCE_TO', xref_gb))
+                        self.data_base.create(rel(xref_gb, 'LINK_TO', self.gb))
                     if len(pdb[i]) > 0:
-                        self.data_base.create(rel(sim_polypeptide, ('XREF', {'id': pdb[i]}), self.pdb))
+                        xref_pdb, = self.data_base.create(node({'id': pdb[i]}))
+                        xref_pdb.add_labels('XRef')
+                        self.data_base.create(rel(sim_polypeptide, 'REFERENCE_TO', xref_pdb))
+                        self.data_base.create(rel(xref_pdb, 'LINK_TO', self.pdb))
                     if len(sp[i]) > 0:
-                        self.data_base.create(rel(sim_polypeptide, ('XREF', {'id': sp[i]}), self.sp))
+                        xref_sp, = self.data_base.create(node({'id': sp[i]}))
+                        xref_sp.add_labels('XRef')
+                        self.data_base.create(rel(sim_polypeptide, 'REFERENCE_TO', xref_sp))
+                        self.data_base.create(rel(xref_sp, 'LINK_TO', self.sp))
             else:
                 print 'Found! ' + str(polypeptide_counter)
                 polypeptide_counter += 1
 
-    def _search_similar_polypeptides(self, organism):
-        session = cypher.Session()
-        transaction = session.create_transaction()
-        #query = 'MATCH (a:' + organism + ')-[r:PART_OF]-(b:' + label + ') RETURN b'
-        query = 'match (poly_new:polypeptide)-[:`SIMILAR`]->(poly_org:polypeptide)-[:`PART_OF`]->(organism:' + organism + ') return poly_org'
-        transaction.append(query)
-        #print query
-        transaction_out = transaction.execute()
-        nodes = []
-        for node in transaction_out[0]:
-            #print node
-            nodes.append(node[0])
-        return nodes
+    #def _search_similar_polypeptides(self, organism):
+    #    session = cypher.Session()
+    #    transaction = session.create_transaction()
+    #    #query = 'MATCH (a:' + organism + ')-[r:PART_OF]-(b:' + label + ') RETURN b'
+    #    query = 'match (poly_new:polypeptide)-[:`SIMILAR`]->(poly_org:polypeptide)-[:`PART_OF`]->(organism:' + organism + ') return poly_org'
+    #    transaction.append(query)
+    #    #print query
+    #    transaction_out = transaction.execute()
+    #    nodes = []
+    #    for node in transaction_out[0]:
+    #        #print node
+    #        nodes.append(node[0])
+    #    return nodes
 
     def _blaster(self, protein_sequence, offline = True, similar_quantity = 3, e_value = 0.01):
         if offline:
@@ -236,14 +271,16 @@ class Biome_db():
             blast_write = NCBIWWW.qblast('blastp', 'nr', protein_sequence)
             blast_read = NCBIXML.read(blast_write)
         homolog_seq, gb, pdb, sp = [], [], [], []
+        if similar_quantity < 0:
+            similar_quantity = len(blast_read.alignments)
         #check alignments - they can be empty!
         for i in xrange(similar_quantity):
             gb.append(str(blast_read.alignments[i].title.partition('gb|')[-1].partition('|')[0]))
             pdb.append(str(blast_read.alignments[i].title.partition('pdb|')[-1].partition('|')[0]))
             sp.append(str(blast_read.alignments[i].title.partition('sp|')[-1].partition('|')[0]))
             homolog_seq.append(blast_read.alignments[i].hsps[0].match)
-        #return blast_read.alignments[i].hsps[0].match, gb, pdb, sp
-        return homolog_seq, gb, pdb, sp
+        blast_write.close()
+        return homolog_seq, gb, pdb, sp, similar_quantity
 
     def search_one_rel(self, label_out, label_in, relation):
         session = cypher.Session()
@@ -269,7 +306,7 @@ class Biome_db():
             out.append(result.values)
         return out
 
-#Testing function
+#Testing functions
 #def blast_standalone(protein_sequence = '/home/artem/work/reps/neo4j/prot.txt', e_value = 0.01, similar_quantity = 3):
 #    cline=NcbiblastpCommandline(query=protein_sequence,
 #                                db='/home/artem/BLAST_DB/nr', evalue=e_value,
@@ -280,3 +317,19 @@ class Biome_db():
     #for record in rec.alignments[:similar_quantity]:
 #seems to work. Check on more protein examples and make as class
 
+def dna2poly_validator(sequence):
+    rec = SeqIO.read(sequence, 'genbank')
+    cds = []
+    err = []
+    for feature in rec.features:
+        if feature.type == 'CDS':
+            cds.append(feature)
+    for c in cds:
+        seq_translate = c.qualifiers['translation'][0]
+        translate = str(rec.seq[c.location.nofuzzy_start:c.location.nofuzzy_end])
+        translate = Seq(translate, generic_dna)
+        translate = translate.translate()#[:-1]
+        print seq_translate == str(translate)[:-1]
+        if seq_translate != str(translate):
+            err.append((seq_translate, str(translate)))
+    return err
