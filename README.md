@@ -67,7 +67,7 @@ If you want to add a label to a node or a group of nodes you can use method 'add
 ````
 graph_database.add_label_to_nodes('Polyppetide', 'Enzyme')
 ````
-If you want to add a lavel for certain node you can use additional searching arguments. In this case you have set property key and value:
+If you want to add a lavel for certain node you can use additional searching arguments. In this case you have set property key and value. In this example we are giong to add label 'Verified' to a node with label 'Term' and property 'name' with value 'DNA primase/helicase':
 ````
 graph_database.add_label_to_nodes('Term', 'Verified', 'name', 'DNA primase/helicase')
 ````
