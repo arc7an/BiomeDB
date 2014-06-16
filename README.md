@@ -87,6 +87,6 @@ graph_database.relation_similar(offline = False, similar_quantity = 3, e_value =
 ````
 Example of offline query:
 ````
-graph_database.relation_similar(offline = False, similar_quantity = 3, e_value = 0.01, db='/path/to/your/local/base')
+graph_database.relation_similar(offline = True, similar_quantity = 3, e_value = 0.01, db='/path/to/your/local/base')
 ````
 
