@@ -72,4 +72,21 @@ If you want to add a lavel for certain node you can use additional searching arg
 graph_database.add_label_to_nodes('Term', 'Verified', 'name', 'DNA primase/helicase')
 ````
 
-There is also a method which allows to add new properties to nodes.
+There is also a method which allows to add new properties to nodes. Here you can add property and its value to a group of nodes with a certain label:
+````
+graph_database.add_property_to_nodes('Term', 'function', 'unknown')
+````
+You can also add property to a certain node, for example let's take the 'Term' node we used in previous method and change its name:
+````
+graph_database.add_property_to_nodes('Term', 'name', 'Example name', 'name', 'DNA primase/helicase')
+````
+There is a method that allow you to seek for homological proteins using both NCBI remote BLAST service and your local BLAST database if have install it. The arguments are offline (True/False) which define wether you want to you use remote NCBI BLAST or your local base, similar_quantity (int) which efine how many homological proteins you want to include to you base, e_value (float) - the BLAST expecte value parameter and db - a string containing path to your local BLAST database (if you choose online BLAST, set db = '' - empty string).
+Example of online query:
+````
+graph_database.relation_similar(offline = False, similar_quantity = 3, e_value = 0.01, db='')
+````
+Example of offline query:
+````
+graph_database.relation_similar(offline = False, similar_quantity = 3, e_value = 0.01, db='/path/to/your/local/base')
+````
+
