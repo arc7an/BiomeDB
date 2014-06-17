@@ -93,7 +93,33 @@ Example of offline query:
 ````
 graph_database.relation_similar(offline = True, similar_quantity = 3, e_value = 0.01, db='/path/to/your/local/base')
 ````
+I want to warn user that these processes are very slow - it takes 4-8 minutes to analyze one polypeptide. So you can break executing with CTRL+C and continue later. There is a veryfication for already analyzed polypeptides, so there will not be any repeats.
 ## Pattern seaching
 There are two methods which allow to search simple patterns:
 
 (x)-[r]->(y) and (a)-[r1]->(b)-[r2]->(c)
+
+In the first case you need to use method. For example let's search for similar polypeptides:
+````
+out=graph_database.search_one_rel(label_out='Polypeptide', label_in='Polypeptide', relation='SIMILAR', return_number = -1)
+````
+"Out" contains list of tuples with  references (node, node, relation). You can fileter out put with return_number argument (default -1). When it equals -1, method returns the previous list, starting with 0 you can choose what element of the tuple you want to return. For example
+````
+out=graph_database.search_one_rel(label_out='Polypeptide', label_in='Polypeptide', relation='SIMILAR', return_number=2)
+````
+returns a list of relations only.
+
+Now we want to find polypeptides that are a part of organism and we use the second method:
+````
+out=graph_database.search_two_rels('Polypeptide', 'Polypeptide', 'Organism', 'SIMILAR', 'PART_OF')
+````
+The output has the same structure as the previous one - it is a list of tuples. You can also filter output with return_number (default -1), it takes values from -1 to 4. For example let's get only homological polypeptides:
+````
+out=graph_database.search_two_rels(label_left='Polypeptide', label_middle='Polypeptide', label_right='Organism', relation_lm='SIMILAR', relation_mr='PART_OF', return_number=0)
+````
+
+Moreover these two methods allow to search using properties of the nodes, what can make queries more specific. All you need is just make input string argument as a Cypher query. For example we want to find a polypeptide which is encoded by a gene with a known locus_tag and that gene is a part of a certain organism:
+````
+out=graph_database.search_two_rels('Polypeptide', 'Gene{locus_tag:"T7p03"}', 'Organism{name:"Enterobacteria_phage_T7"}', 'ENCODES', 'PART_OF', 0)
+````
+The same structures can be used in search_one_rel method.
