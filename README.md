@@ -93,4 +93,7 @@ Example of offline query:
 ````
 graph_database.relation_similar(offline = True, similar_quantity = 3, e_value = 0.01, db='/path/to/your/local/base')
 ````
+## Pattern seaching
+There are two methods which allow to search simple patterns:
 
+(x)-[r]->(y) and (a)-[r1]->(b)-[r2]->(c)
