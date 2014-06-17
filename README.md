@@ -1,6 +1,11 @@
 # BiomeDB
 
-A Python module which uses functions from BioPython to process molecular biology data and communicate with external databases. To administrate Neo4j database py2neo module was used.
+A Python module which uses functions from BioPython (ver. 1.63) to process molecular biology data and communicate with external databases. To administrate Neo4j (2.1.2) database py2neo (ver. 1.6.4) module was used. 
+Links:
+Neo4j [http://www.neo4j.org/download]
+BioPython [http://biopython.org/wiki/Download]
+py2ne0 [https://github.com/nigelsmall/py2neo]
+
 
 ## Quick start
 In Python shell:
