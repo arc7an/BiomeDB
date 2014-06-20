@@ -7,7 +7,7 @@ Links: [Neo4j](http://www.neo4j.org/download), [BioPython](http://biopython.org/
 ## Quick start
 In Python shell:
 ````
-from Data_base_classes_new_arch import *
+from BiomeDB_classes *
 ````
 
 This imports class, contained in module and additiinal modules such BioPython, py2neo, etc.
